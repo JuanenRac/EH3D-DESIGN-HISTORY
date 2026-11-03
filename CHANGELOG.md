@@ -3,6 +3,7 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+- **Shared checks updated:** the validator also compares the badge and the Version row of the README with the manifest, fails when one of its checks cannot run, and the CHANGELOG step of the workflow reads the base branch from the environment.
 
 - Add the library: operations keyed by the stable identity of an object and chained by SHA-256, named states, a serialisation that gives the same bytes for the same content, the comparison of two histories from where they separate and the search of the first bad operation by halving.
 - Report, with stable codes `PHOENIX-DHIS-001` to `PHOENIX-DHIS-004`: a broken chain, an operation without a kind or an object, a state that points to no operation and a reference to an object deleted earlier.
