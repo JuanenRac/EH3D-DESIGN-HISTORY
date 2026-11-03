@@ -107,6 +107,10 @@ impl History {
                 what: "history bytes",
             });
         }
+        // A JSON array would be read as a list of the fields in order, so only an object is a history.
+        if !text.trim_start().starts_with('{') {
+            return Err(HistoryError::BadJson("a JSON object was expected".into()));
+        }
         let history: History =
             serde_json::from_str(text).map_err(|e| HistoryError::BadJson(e.to_string()))?;
         if history.entries.len() > config.max_entries {
