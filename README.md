@@ -6,7 +6,7 @@
 
 <p align="center">🇺🇸 <b>English</b> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-DESIGN-HISTORY: planned as a version-control layer with the semantic history and the logical evolution of the design. No code yet.
+### EH3D-DESIGN-HISTORY: the semantic history of a design: operations chained by hash, named states and the comparison of two histories. Early code.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** nothing. EH3D-DESIGN-HISTORY is only planned: it has no code, no tests of its own and has never run. What exists is the base every repository of the suite carries, plus the written scope, requirements, dependencies, threat model and decisions in `docs/`.
+**Honesty check - what actually runs today:** a Rust library and a command line that read a history of operations (each one keyed by the stable identity of an object and chained to the previous one by a SHA-256), find a change in the past, a state that points nowhere and a reference to an object that was deleted, print the log and compare two histories from the point where they separate. The library can also find the first bad operation by halving. All of it has run only on data made by its own tests. What does not exist: the producer of the operations (it belongs to the design tool), the comparison of two designs by their content and the link with the visual difference of the server.
 
 ---
 
@@ -46,14 +46,14 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Repository checks | 🟡 | The repository check, the check of the pictures and the 3 tests of the base run in CI and pass. |
-| Tests | 🟠 | Only the base has tests (3); the code of the repository will get its own as it is written. |
+| Tests | 🟡 | 14 tests of the Rust code and the 3 of the base pass on a computer. They use only data made by the tests themselves. |
 | Real hardware | 🟠 | Not run on any machine or board: nothing here has been tried on hardware. |
-| Planned function | 🔴 | Not started: none of the planned function has been written. |
-| Requirements | 🔴 | Every requirement is only planned: none is implemented or verified. |
+| Planned function | 🟠 | Written: operations keyed by object identity, the hash chain, named states, the report of references to deleted objects, the comparison of two histories, the search of the first bad operation and a serialisation that gives the same bytes for the same content. Not written: the producer of the operations and the link with the visual difference. |
+| Requirements | 🟠 | The 5 requirements are at prototype: code and tests exist, only on data made by the tests; none is validated. |
 
 ## 🎯 Overview
 
-* **Planned:** EH3D-DESIGN-HISTORY is meant to be a version-control layer with the semantic history and the logical evolution of the design. It is planned as a library without a window, with a command-line interface and, when it applies, a kind of server task. None of this exists yet.
+* **What exists:** a library and a command line, without a window, that read a history, check it (`check`), print it (`log`) and compare two histories (`compare`). **Planned:** the producer of the operations in the design tool, the comparison by the content of the design and a kind of server task.
 
 ## 🧩 Role in EH3D
 
@@ -105,6 +105,8 @@ EH3D-DESIGN-HISTORY/
 │   ├── NOT_YET.md RULES.md                      ideas left for later and rules for writing code
 │   └── adr/                                     the accepted decision records
 ├── AGENTS.md                                    rules for anyone who changes the repository
+├── src/                                         the library and the command line
+├── Cargo.toml  deny.toml                        Rust package and policy of the dependencies
 ├── tools/                                       the repository check, its tests and the picture tools
 ├── images/                                      banner and the Architecture and Repository Structure pictures
 ├── .github/                                     CI and dashboard workflows, issue and pull-request templates
@@ -121,7 +123,7 @@ EH3D-DESIGN-HISTORY/
 
 **Known limits today**
 
-* Planned only: there is no code, nothing has been run and no requirement is implemented.
+* Early code: it has only run on data made by its own tests; it reads no design, and the operations are given to it.
 
 **Next**
 

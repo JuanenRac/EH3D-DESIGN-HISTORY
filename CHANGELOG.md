@@ -3,6 +3,10 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+
+- Add the library: operations keyed by the stable identity of an object and chained by SHA-256, named states, a serialisation that gives the same bytes for the same content, the comparison of two histories from where they separate and the search of the first bad operation by halving.
+- Report, with stable codes `PHOENIX-DHIS-001` to `PHOENIX-DHIS-004`: a broken chain, an operation without a kind or an object, a state that points to no operation and a reference to an object deleted earlier.
+- Add the command line (`check`, `log`, `compare`) and a settings file. Run format, lints and tests of the Rust code on Linux and Windows in the CI.
 - **The workflows are hardened:** every action is pinned by its commit with its version in a comment, and the checkouts keep no credentials.
 
 ## [0.0.1] - The base of the repository

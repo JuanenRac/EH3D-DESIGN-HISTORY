@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | 🇪🇸 <b>Español</b> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-DESIGN-HISTORY: planificado como un control de versiones con el historial semántico y la evolución lógica del diseño. Todavía sin código.
+### EH3D-DESIGN-HISTORY: el historial semántico de un diseño: operaciones encadenadas por hash, estados con nombre y la comparación de dos historiales. Código inicial.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Comprobación de honestidad - lo que se ejecuta hoy:** nada. EH3D-DESIGN-HISTORY solo está planificado: no tiene código, ni pruebas propias, y nunca se ha ejecutado. Lo que existe es la base que lleva todo repositorio de la suite, más el alcance, los requisitos, las dependencias, el modelo de amenazas y las decisiones escritos en `docs/`.
+**Comprobación de honestidad - lo que se ejecuta hoy:** una biblioteca de Rust y una línea de comandos que leen un historial de operaciones (cada una con la identidad estable de un objeto y encadenada a la anterior por un SHA-256), encuentran un cambio en el pasado, un estado que no apunta a nada y una referencia a un objeto que se borró, muestran el registro y comparan dos historiales desde el punto en que se separan. La biblioteca también puede encontrar la primera operación mala por bisección. Todo se ha ejecutado solo con datos hechos por sus propias pruebas. Lo que no existe: el productor de las operaciones (pertenece a la herramienta de diseño), la comparación de dos diseños por su contenido y el enlace con la diferencia visual del servidor.
 
 ---
 
@@ -46,14 +46,14 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Comprobaciones del repositorio | 🟡 | La comprobación del repositorio, la de las imágenes y las 3 pruebas de la base se ejecutan en el CI y pasan. |
-| Pruebas | 🟠 | Solo la base tiene pruebas (3); el código del repositorio tendrá las suyas a medida que se escriba. |
+| Pruebas | 🟡 | Las 14 pruebas del código Rust y las 3 de la base pasan en un ordenador. Usan solo datos hechos por las propias pruebas. |
 | Hardware real | 🟠 | No se ha ejecutado en ninguna máquina ni placa: nada de aquí se ha probado en hardware. |
-| Función planificada | 🔴 | Sin empezar: nada de la función planificada está escrito. |
-| Requisitos | 🔴 | Todos los requisitos están solo planificados: ninguno está implementado ni verificado. |
+| Función planificada | 🟠 | Escrito: operaciones con la identidad del objeto, la cadena de hashes, los estados con nombre, el aviso de referencias a objetos borrados, la comparación de dos historiales, la búsqueda de la primera operación mala y una serialización que da los mismos bytes para el mismo contenido. Sin escribir: el productor de las operaciones y el enlace con la diferencia visual. |
+| Requisitos | 🟠 | Los 5 requisitos están en prototipo: hay código y pruebas, solo con datos hechos por las pruebas; ninguno está validado. |
 
 ## 🎯 Resumen
 
-* **Planificado:** EH3D-DESIGN-HISTORY pretende ser un control de versiones con el historial semántico y la evolución lógica del diseño. Se planea como una biblioteca sin ventana, con interfaz de línea de comandos y, cuando proceda, un tipo de tarea del servidor. Nada de esto existe todavía.
+* **Lo que existe:** una biblioteca y una línea de comandos, sin ventana, que leen un historial, lo comprueban (`check`), lo muestran (`log`) y comparan dos historiales (`compare`). **Planificado:** el productor de las operaciones en la herramienta de diseño, la comparación por el contenido del diseño y un tipo de tarea del servidor.
 
 ## 🧩 Papel en EH3D
 
@@ -105,6 +105,8 @@ EH3D-DESIGN-HISTORY/
 │   ├── NOT_YET.md RULES.md                      ideas para más adelante y reglas para escribir código
 │   └── adr/                                     los registros de decisiones aceptadas
 ├── AGENTS.md                                    reglas para quien cambia el repositorio
+├── src/                                         la biblioteca y la línea de comandos
+├── Cargo.toml  deny.toml                        paquete de Rust y política de dependencias
 ├── tools/                                       la comprobación del repositorio, sus pruebas y las herramientas de las imágenes
 ├── images/                                      banner y las imágenes de Arquitectura y Estructura del repositorio
 ├── .github/                                     flujos de CI y del panel, plantillas de issues y pull requests
@@ -121,7 +123,7 @@ EH3D-DESIGN-HISTORY/
 
 **Límites conocidos hoy**
 
-* Solo planificado: no hay código, no se ha ejecutado nada y ningún requisito está implementado.
+* Código inicial: solo se ha ejecutado con datos hechos por sus propias pruebas; no lee ningún diseño, las operaciones se le dan.
 
 **Siguiente**
 

@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | 🇵🇹 <b>Português</b></p>
 
-### EH3D-DESIGN-HISTORY: planeado como um controlo de versões com o histórico semântico e a evolução lógica do projeto. Ainda sem código.
+### EH3D-DESIGN-HISTORY: o histórico semântico de um projeto: operações encadeadas por hash, estados com nome e a comparação de dois históricos. Código inicial.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Verificação de honestidade - o que funciona hoje:** nada. EH3D-DESIGN-HISTORY está apenas planeado: não tem código, nem testes próprios, e nunca foi executado. O que existe é a base que todo o repositório da suite leva, mais o âmbito, os requisitos, as dependências, o modelo de ameaças e as decisões escritos em `docs/`.
+**Verificação de honestidade - o que corre hoje:** uma biblioteca Rust e uma linha de comandos que leem um histórico de operações (cada uma com a identidade estável de um objeto e encadeada à anterior por um SHA-256), encontram uma alteração no passado, um estado que não aponta para nada e uma referência a um objeto apagado, mostram o registo e comparam dois históricos a partir do ponto em que se separam. A biblioteca também pode encontrar a primeira operação má por bisseção. Tudo correu apenas com dados feitos pelos próprios testes. O que não existe: o produtor das operações (pertence à ferramenta de projeto), a comparação de dois projetos pelo seu conteúdo e a ligação com a diferença visual do servidor.
 
 ---
 
@@ -46,14 +46,14 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Verificações do repositório | 🟡 | A verificação do repositório, a das imagens e os 3 testes da base correm na CI e passam. |
-| Testes | 🟠 | Só a base tem testes (3); o código do repositório terá os seus à medida que for escrito. |
+| Testes | 🟡 | Os 14 testes do código Rust e os 3 da base passam num computador. Usam apenas dados feitos pelos próprios testes. |
 | Hardware real | 🟠 | Não foi executado em nenhuma máquina nem placa: nada aqui foi experimentado em hardware. |
-| Função planeada | 🔴 | Por começar: nada da função planeada está escrito. |
-| Requisitos | 🔴 | Todos os requisitos estão apenas planeados: nenhum está implementado nem verificado. |
+| Função planeada | 🟠 | Escrito: operações com a identidade do objeto, a cadeia de hashes, os estados com nome, o aviso de referências a objetos apagados, a comparação de dois históricos, a procura da primeira operação má e uma serialização que dá os mesmos bytes para o mesmo conteúdo. Por escrever: o produtor das operações e a ligação com a diferença visual. |
+| Requisitos | 🟠 | Os 5 requisitos estão em protótipo: existem código e testes, só com dados feitos pelos testes; nenhum está validado. |
 
 ## 🎯 Visão geral
 
-* **Planeado:** EH3D-DESIGN-HISTORY pretende ser um controlo de versões com o histórico semântico e a evolução lógica do projeto. Está planeado como uma biblioteca sem janela, com interface de linha de comandos e, quando se aplicar, um tipo de tarefa do servidor. Nada disto existe ainda.
+* **O que existe:** uma biblioteca e uma linha de comandos, sem janela, que leem um histórico, verificam-no (`check`), mostram-no (`log`) e comparam dois históricos (`compare`). **Planeado:** o produtor das operações na ferramenta de projeto, a comparação pelo conteúdo do projeto e um tipo de tarefa do servidor.
 
 ## 🧩 Papel no EH3D
 
@@ -105,6 +105,8 @@ EH3D-DESIGN-HISTORY/
 │   ├── NOT_YET.md RULES.md                      ideias para mais tarde e regras para escrever código
 │   └── adr/                                     os registos das decisões aceites
 ├── AGENTS.md                                    regras para quem altera o repositório
+├── src/                                         a biblioteca e a linha de comandos
+├── Cargo.toml  deny.toml                        pacote Rust e política das dependências
 ├── tools/                                       a verificação do repositório, os seus testes e as ferramentas das imagens
 ├── images/                                      banner e as imagens de Arquitetura e Estrutura do repositório
 ├── .github/                                     fluxos de CI e do painel, modelos de issues e pull requests
@@ -121,7 +123,7 @@ EH3D-DESIGN-HISTORY/
 
 **Limites conhecidos hoje**
 
-* Apenas planeado: não há código, nada foi executado e nenhum requisito está implementado.
+* Código inicial: só correu com dados dos próprios testes; não lê nenhum projeto, as operações são-lhe dadas.
 
 **A seguir**
 

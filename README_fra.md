@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | 🇫🇷 <b>Français</b> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-DESIGN-HISTORY : prévu comme un contrôle de versions avec l'historique sémantique et l'évolution logique de la conception. Pas encore de code.
+### EH3D-DESIGN-HISTORY : l'historique sémantique d'une conception : opérations chaînées par hash, états nommés et comparaison de deux historiques. Code initial.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** rien. EH3D-DESIGN-HISTORY est seulement prévu : il n'a pas de code, pas de tests propres et n'a jamais été exécuté. Ce qui existe, c'est la base de tout dépôt de la suite, plus le périmètre, les exigences, les dépendances, le modèle de menaces et les décisions écrits dans `docs/`.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une bibliothèque Rust et une ligne de commande qui lisent un historique d'opérations (chacune avec l'identité stable d'un objet et chaînée à la précédente par un SHA-256), trouvent un changement dans le passé, un état qui ne pointe sur rien et une référence à un objet supprimé, affichent le journal et comparent deux historiques à partir du point où ils se séparent. La bibliothèque peut aussi trouver la première opération fautive par dichotomie. Tout n'a tourné que sur des données faites par ses propres tests. N'existent pas : le producteur des opérations (il relève de l'outil de conception), la comparaison de deux conceptions par leur contenu et le lien avec la différence visuelle du serveur.
 
 ---
 
@@ -46,14 +46,14 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟠 | Seule la base a des tests (3) ; le code du dépôt aura les siens au fur et à mesure qu'il sera écrit. |
+| Tests | 🟡 | Les 14 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
-| Fonction prévue | 🔴 | Pas commencée : rien de la fonction prévue n'est écrit. |
-| Exigences | 🔴 | Toutes les exigences sont seulement prévues : aucune n'est implémentée ni vérifiée. |
+| Fonction prévue | 🟠 | Écrit : opérations avec l'identité de l'objet, la chaîne de hashes, les états nommés, le signalement des références à des objets supprimés, la comparaison de deux historiques, la recherche de la première opération fautive et une sérialisation qui donne les mêmes octets pour le même contenu. Non écrit : le producteur des opérations et le lien avec la différence visuelle. |
+| Exigences | 🟠 | Les 5 exigences sont au stade de prototype : le code et les tests existent, seulement sur des données faites par les tests ; aucune n'est validée. |
 
 ## 🎯 Présentation
 
-* **Prévu :** EH3D-DESIGN-HISTORY doit être un contrôle de versions avec l'historique sémantique et l'évolution logique de la conception. Il est prévu comme une bibliothèque sans fenêtre, avec une interface en ligne de commande et, le cas échéant, un type de tâche du serveur. Rien de cela n'existe encore.
+* **Ce qui existe :** une bibliothèque et une ligne de commande, sans fenêtre, qui lisent un historique, le contrôlent (`check`), l'affichent (`log`) et comparent deux historiques (`compare`). **Prévu :** le producteur des opérations dans l'outil de conception, la comparaison par le contenu de la conception et un type de tâche du serveur.
 
 ## 🧩 Rôle dans EH3D
 
@@ -105,6 +105,8 @@ EH3D-DESIGN-HISTORY/
 │   ├── NOT_YET.md RULES.md                      idées pour plus tard et règles d'écriture du code
 │   └── adr/                                     les décisions acceptées
 ├── AGENTS.md                                    règles pour quiconque modifie le dépôt
+├── src/                                         la bibliothèque et la ligne de commande
+├── Cargo.toml  deny.toml                        paquet Rust et politique des dépendances
 ├── tools/                                       le contrôle du dépôt, ses tests et les outils des images
 ├── images/                                      bannière et images d'Architecture et de Structure du dépôt
 ├── .github/                                     workflows de CI et du tableau de bord, modèles d'issues et de pull requests
@@ -121,7 +123,7 @@ EH3D-DESIGN-HISTORY/
 
 **Limites connues aujourd'hui**
 
-* Seulement prévu : il n'y a pas de code, rien n'a été exécuté et aucune exigence n'est implémentée.
+* Code initial : n'a tourné que sur des données de ses propres tests ; il ne lit aucune conception, les opérations lui sont données.
 
 **Ensuite**
 

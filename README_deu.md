@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | 🇩🇪 <b>Deutsch</b> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-DESIGN-HISTORY: geplant als eine Versionsverwaltung mit dem semantischen Verlauf und der logischen Entwicklung des Entwurfs. Noch kein Code.
+### EH3D-DESIGN-HISTORY: die semantische Historie eines Entwurfs: per Hash verkettete Operationen, benannte Zustände und der Vergleich zweier Historien. Früher Code.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute tatsächlich läuft:** nichts. EH3D-DESIGN-HISTORY ist nur geplant: Es gibt keinen Code, keine eigenen Tests, und es ist nie gelaufen. Vorhanden sind die Basis, die jedes Repository der Suite trägt, sowie Umfang, Anforderungen, Abhängigkeiten, Bedrohungsmodell und Entscheidungen in `docs/`.
+**Ehrlichkeitscheck - was heute tatsächlich läuft:** eine Rust-Bibliothek und eine Befehlszeile, die eine Historie von Operationen lesen (jede mit der stabilen Identität eines Objekts und per SHA-256 mit der vorigen verkettet), eine Änderung in der Vergangenheit, einen Zustand, der ins Leere zeigt, und einen Verweis auf ein gelöschtes Objekt finden, das Protokoll ausgeben und zwei Historien ab dem Punkt vergleichen, an dem sie sich trennen. Die Bibliothek kann auch die erste fehlerhafte Operation durch Halbieren finden. Alles lief nur mit Daten, die die eigenen Tests erzeugen. Es fehlen: der Erzeuger der Operationen (er gehört zum Entwurfswerkzeug), der Vergleich zweier Entwürfe nach Inhalt und die Verbindung zur visuellen Differenz des Servers.
 
 ---
 
@@ -46,14 +46,14 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Repository-Prüfungen | 🟡 | Die Repository-Prüfung, die Prüfung der Bilder und die 3 Tests der Basis laufen in der CI und bestehen. |
-| Tests | 🟠 | Nur die Basis hat Tests (3); der Code des Repositorys bekommt seine eigenen, sobald er geschrieben wird. |
+| Tests | 🟡 | Die 14 Tests des Rust-Codes und die 3 der Basis bestehen auf einem Rechner. Sie verwenden nur Daten, die die Tests selbst erzeugen. |
 | Echte Hardware | 🟠 | Auf keiner Maschine und keiner Platine ausgeführt: nichts hier wurde auf Hardware ausprobiert. |
-| Geplante Funktion | 🔴 | Nicht begonnen: Von der geplanten Funktion ist nichts geschrieben. |
-| Anforderungen | 🔴 | Alle Anforderungen sind nur geplant: Keine ist umgesetzt oder geprüft. |
+| Geplante Funktion | 🟠 | Geschrieben: Operationen mit Objektidentität, die Hash-Kette, benannte Zustände, die Meldung von Verweisen auf gelöschte Objekte, der Vergleich zweier Historien, die Suche nach der ersten fehlerhaften Operation und eine Serialisierung, die für denselben Inhalt dieselben Bytes liefert. Nicht geschrieben: der Erzeuger der Operationen und die Verbindung zur visuellen Differenz. |
+| Anforderungen | 🟠 | Die 5 Anforderungen sind im Prototyp: Code und Tests existieren, nur mit von den Tests erzeugten Daten; keine ist validiert. |
 
 ## 🎯 Überblick
 
-* **Geplant:** EH3D-DESIGN-HISTORY soll eine Versionsverwaltung mit dem semantischen Verlauf und der logischen Entwicklung des Entwurfs werden. Vorgesehen ist eine Bibliothek ohne Fenster mit Kommandozeile und, wo es passt, einer Art Server-Aufgabe. Nichts davon existiert bisher.
+* **Was es gibt:** eine Bibliothek und eine Befehlszeile ohne Fenster, die eine Historie lesen, prüfen (`check`), ausgeben (`log`) und zwei Historien vergleichen (`compare`). **Geplant:** der Erzeuger der Operationen im Entwurfswerkzeug, der Vergleich nach dem Inhalt des Entwurfs und eine Art Serveraufgabe.
 
 ## 🧩 Rolle in EH3D
 
@@ -105,6 +105,8 @@ EH3D-DESIGN-HISTORY/
 │   ├── NOT_YET.md RULES.md                      Ideen für später und Regeln zum Schreiben von Code
 │   └── adr/                                     die angenommenen Entscheidungsprotokolle
 ├── AGENTS.md                                    Regeln für alle, die das Repository ändern
+├── src/                                         die Bibliothek und die Befehlszeile
+├── Cargo.toml  deny.toml                        Rust-Paket und Richtlinie der Abhängigkeiten
 ├── tools/                                       die Repository-Prüfung, ihre Tests und die Bild-Werkzeuge
 ├── images/                                      Banner und die Bilder von Architektur und Repository-Struktur
 ├── .github/                                     CI- und Dashboard-Workflows, Vorlagen für Issues und Pull Requests
@@ -121,7 +123,7 @@ EH3D-DESIGN-HISTORY/
 
 **Bekannte Grenzen heute**
 
-* Nur geplant: Es gibt keinen Code, nichts wurde ausgeführt und keine Anforderung ist umgesetzt.
+* Früher Code: nur mit Daten der eigenen Tests ausgeführt; er liest keinen Entwurf, die Operationen werden ihm gegeben.
 
 **Als Nächstes**
 

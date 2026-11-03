@@ -1,0 +1,28 @@
+[package]
+name = "eh3d-design-history"
+version = "0.0.1"
+edition = "2021"
+rust-version = "1.88"
+description = "Semantic history of a design: operations that chain by hash, named states and the comparison of two histories"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/JuanenRac/EH3D-DESIGN-HISTORY"
+readme = "README.md"
+
+[lib]
+name = "eh3d_design_history"
+path = "src/lib.rs"
+
+[[bin]]
+name = "eh3d-design-history"
+path = "src/main.rs"
+
+[dependencies]
+# sha2: the hash that chains the operations
+sha2 = "0.10"
+# serde / serde_json: the history is plain JSON
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
