@@ -19,4 +19,4 @@ The official state of each capability is in REQUIREMENTS.md: 5 requirements, all
 
 ## Known technical debt and omitted tests
 
-14 tests of the Rust code and the 3 of the base; the Rust tests build their own histories and never touch a real design. `cargo deny` is not run yet.
+23 tests of the Rust code and the 3 of the base; the Rust tests build their own histories and never touch a real design. Nine of them run the simulation (`src/simulation.rs`): a seeded twin of the design tool that makes the same operations for the same seed, the five faults that can be injected (a changed operation, a missing one, a state that points nowhere, a use after deletion, an operation without a kind), the recovery to the last clean operation and the search by halving over a long history. What is still pending is the proof against a real design tool, which does not exist yet. `cargo deny` is not run yet.

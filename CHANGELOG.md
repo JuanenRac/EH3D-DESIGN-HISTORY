@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Simulation mode:** add `src/simulation.rs`, a host twin of the design tool: a seeded producer of operations (the same seed gives the same history), five injectable faults (changed content, missing operation, dangling state, use after deletion, operation without a kind), a recovery that keeps the longest clean prefix and a producer that resumes from a recovered history. Nine deterministic tests cover them. The manifest now says `evidence: simulator`; nothing has run against a real design tool.
+
 ## [0.0.3] - Split CI with a build cache and a pinned Rust toolchain
 
 - **The shared validation tools are updated:** the validator also runs the workflow and lessons checks of the suite with their latest rules, including a check to run before every push.

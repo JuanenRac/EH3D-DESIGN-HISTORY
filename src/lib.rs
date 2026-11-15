@@ -13,6 +13,7 @@ pub mod cli;
 pub mod config;
 pub mod error;
 pub mod history;
+pub mod simulation;
 
 pub use error::HistoryError;
 pub use history::{Entry, History};
