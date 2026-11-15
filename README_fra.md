@@ -46,7 +46,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟡 | Les 14 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
+| Tests | 🟡 | Les 23 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. Elles incluent une simulation à graine fixe de l'outil de conception qui produit les opérations, avec pannes injectées et reprise. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
 | Fonction prévue | 🟠 | Écrit : opérations avec l'identité de l'objet, la chaîne de hashes, les états nommés, le signalement des références à des objets supprimés, la comparaison de deux historiques, la recherche de la première opération fautive et une sérialisation qui donne les mêmes octets pour le même contenu. Non écrit : le producteur des opérations et le lien avec la différence visuelle. |
 | Exigences | 🟠 | Les 5 exigences sont au stade de prototype : le code et les tests existent, seulement sur des données faites par les tests ; aucune n'est validée. |
