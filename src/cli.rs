@@ -67,7 +67,18 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<HistoryE
             let history = load(&args[1])?;
             let findings = history.check(&config);
             for f in &findings {
-                let _ = writeln!(out, "{} #{}: {}", f.code.as_str(), f.seq, f.message);
+                let place = match f.index {
+                    Some(i) if f.seq != i as u64 + 1 => format!(" (position {})", i + 1),
+                    _ => String::new(),
+                };
+                let _ = writeln!(
+                    out,
+                    "{} #{}{}: {}",
+                    f.code.as_str(),
+                    f.seq,
+                    place,
+                    f.message
+                );
             }
             let _ = writeln!(
                 out,
@@ -94,11 +105,16 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<HistoryE
             for e in &d.only_b {
                 let _ = writeln!(out, "only second: {} {} {}", e.seq, e.kind, e.object);
             }
-            Ok(if d.only_a.is_empty() && d.only_b.is_empty() {
-                0
-            } else {
-                1
-            })
+            for name in &d.states_differ {
+                let _ = writeln!(out, "state differs: {name}");
+            }
+            Ok(
+                if d.only_a.is_empty() && d.only_b.is_empty() && d.states_differ.is_empty() {
+                    0
+                } else {
+                    1
+                },
+            )
         }
         _ => Err(None),
     }
@@ -165,6 +181,26 @@ mod tests {
         assert!(
             text.contains("common 2") && text.contains("only second: 3 rule-altered r1"),
             "{text}"
+        );
+    }
+
+    #[test]
+    fn two_histories_with_the_same_operations_but_different_states_are_not_the_same() {
+        let mut a = History::default();
+        a.append("create", "r1", "a rule", None, None).unwrap();
+        let mut b = a.clone();
+        let hash = a.entries[0].hash.clone();
+        b.name_state("approved", &hash);
+        let work = tempfile::tempdir().unwrap();
+        let (pa, pb) = (work.path().join("a.json"), work.path().join("b.json"));
+        fs::write(&pa, a.to_json().unwrap()).unwrap();
+        fs::write(&pb, b.to_json().unwrap()).unwrap();
+        let (code, text, _) = call(&["compare", pa.to_str().unwrap(), pb.to_str().unwrap()]);
+        assert_eq!(code, 1, "{text}");
+        assert!(text.contains("state differs: approved"), "{text}");
+        assert_eq!(
+            call(&["compare", pa.to_str().unwrap(), pa.to_str().unwrap()]).0,
+            0
         );
     }
 

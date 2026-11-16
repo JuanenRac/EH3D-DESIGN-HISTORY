@@ -72,6 +72,8 @@ pub struct Finding {
     pub code: Code,
     /// The number of the operation it is about (0 for the history as a whole or a state).
     pub seq: u64,
+    /// The place of the operation in the list (0 is the first), whatever number it carries; `None` for the history as a whole or a state.
+    pub index: Option<usize>,
     /// What is wrong, in English.
     pub message: String,
 }
@@ -85,6 +87,8 @@ pub struct Divergence {
     pub only_a: Vec<Entry>,
     /// What only the second one did afterwards.
     pub only_b: Vec<Entry>,
+    /// The names of the states that exist in only one of the two or point to a different operation, sorted.
+    pub states_differ: Vec<String>,
 }
 
 /// The history.
@@ -172,6 +176,7 @@ impl History {
             let at = |code, message: String| Finding {
                 code,
                 seq: e.seq,
+                index: Some(index),
                 message,
             };
             if e.seq != index as u64 + 1 {
@@ -220,6 +225,7 @@ impl History {
                 out.push(Finding {
                     code: Code::UnknownState,
                     seq: 0,
+                    index: None,
                     message: format!(
                         "the state `{name}` points to an operation that is not in the history"
                     ),
@@ -237,7 +243,14 @@ impl History {
             .zip(&other.entries)
             .take_while(|(a, b)| a.hash == b.hash && a == b)
             .count();
+        let names: BTreeSet<&String> = self.states.keys().chain(other.states.keys()).collect();
+        let states_differ = names
+            .into_iter()
+            .filter(|n| self.states.get(*n) != other.states.get(*n))
+            .cloned()
+            .collect();
         Divergence {
+            states_differ,
             common,
             only_a: self.entries[common..].to_vec(),
             only_b: other.entries[common..].to_vec(),
