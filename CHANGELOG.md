@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A finding says where its operation is, and `compare` also compares the named states:** `Finding` has a new field `index` (the place of the operation in the list, whatever number it carries; the text of `check` adds `(position N)` when the number does not match), `Divergence` has `states_differ`, and `compare` lists `state differs: NAME` and exits with 1 when two histories with the same operations name different states. Tests cover it.
 - **Simulation mode:** add `src/simulation.rs`, a host twin of the design tool: a seeded producer of operations (the same seed gives the same history), five injectable faults (changed content, missing operation, dangling state, use after deletion, operation without a kind), a recovery that keeps the longest clean prefix and a producer that resumes from a recovered history. Nine deterministic tests cover them. The manifest now says `evidence: simulator`; nothing has run against a real design tool.
 
 ## [0.0.3] - Split CI with a build cache and a pinned Rust toolchain
