@@ -329,6 +329,14 @@ mod tests {
     }
 
     #[test]
+    fn the_hashes_of_a_fixed_history_are_the_known_ones() {
+        // fixed vectors: a change of the order of the fields or of the way the content is written changes every hash that was ever quoted
+        let h = sample();
+        let hashes: Vec<&str> = h.entries.iter().map(|e| e.hash.as_str()).collect();
+        assert_eq!(hashes, ["TBD", "TBD", "TBD"]);
+    }
+
+    #[test]
     fn a_change_in_the_past_breaks_the_chain() {
         let mut h = sample();
         h.entries[1].after = Some("9,9".into());
