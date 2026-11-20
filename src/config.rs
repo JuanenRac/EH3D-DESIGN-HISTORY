@@ -38,6 +38,7 @@ impl Config {
     /// Parse a settings file (`key = value` lines, `#` comments).
     pub fn parse(text: &str) -> Result<Config, HistoryError> {
         let mut config = Config::default();
+        let mut kinds_line = 0;
         for (index, raw) in text.lines().enumerate() {
             let line = index + 1;
             let raw = raw.trim();
@@ -53,7 +54,13 @@ impl Config {
                 key: key.to_string(),
             };
             match key {
-                "max_file_bytes" => config.max_file_bytes = value.parse().map_err(|_| bad())?,
+                "max_file_bytes" => {
+                    let n: u64 = value.parse().map_err(|_| bad())?;
+                    if n == 0 {
+                        return Err(bad());
+                    }
+                    config.max_file_bytes = n;
+                }
                 "max_entries" => {
                     let n: usize = value.parse().map_err(|_| bad())?;
                     if n == 0 {
@@ -66,12 +73,14 @@ impl Config {
                         return Err(bad());
                     }
                     config.delete_kind = value.to_string();
+                    kinds_line = line;
                 }
                 "create_kind" => {
                     if !kind_name(value) {
                         return Err(bad());
                     }
                     config.create_kind = value.to_string();
+                    kinds_line = line;
                 }
                 _ => {
                     return Err(HistoryError::ConfigUnknownKey {
@@ -80,6 +89,13 @@ impl Config {
                     })
                 }
             }
+        }
+        // one kind cannot both create and delete: every object would be deleted and created by the same operation
+        if config.create_kind == config.delete_kind {
+            return Err(HistoryError::ConfigBadValue {
+                line: kinds_line,
+                key: "create_kind".into(),
+            });
         }
         Ok(config)
     }
@@ -94,6 +110,25 @@ mod tests {
         let c = Config::parse("").unwrap();
         assert_eq!(c.delete_kind, "object-deleted");
         assert_eq!(c.create_kind, "object-created");
+    }
+
+    #[test]
+    fn one_kind_cannot_create_and_delete_but_the_two_can_be_swapped() {
+        assert!(matches!(
+            Config::parse("# c\ncreate_kind = part-removed\ndelete_kind = part-removed\n"),
+            Err(HistoryError::ConfigBadValue { line: 3, .. })
+        ));
+        // the default of the other one is the same name
+        assert!(matches!(
+            Config::parse("delete_kind = object-created\n"),
+            Err(HistoryError::ConfigBadValue { line: 1, .. })
+        ));
+        let c =
+            Config::parse("delete_kind = object-created\ncreate_kind = object-deleted\n").unwrap();
+        assert_eq!(
+            (c.delete_kind.as_str(), c.create_kind.as_str()),
+            ("object-created", "object-deleted")
+        );
     }
 
     #[test]
@@ -115,6 +150,7 @@ mod tests {
             "delete_kind = Bad Kind\n",
             "create_kind =\n",
             "max_entries = 0\n",
+            "max_file_bytes = 0\n",
         ] {
             assert!(
                 matches!(

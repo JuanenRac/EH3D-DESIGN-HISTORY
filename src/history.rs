@@ -111,6 +111,8 @@ impl History {
                 what: "history bytes",
             });
         }
+        // a file saved by an editor of Windows may start with the mark of the byte order
+        let text = text.strip_prefix('\u{feff}').unwrap_or(text);
         // A JSON array would be read as a list of the fields in order, so only an object is a history.
         if !text.trim_start().starts_with('{') {
             return Err(HistoryError::BadJson("a JSON object was expected".into()));
@@ -221,6 +223,14 @@ impl History {
             previous = e.hash.clone();
         }
         for (name, hash) in &self.states {
+            if name.trim().is_empty() {
+                out.push(Finding {
+                    code: Code::BadState,
+                    seq: 0,
+                    index: None,
+                    message: "a named state has an empty name".into(),
+                });
+            }
             if !hashes.contains(hash.as_str()) {
                 out.push(Finding {
                     code: Code::UnknownState,
@@ -355,6 +365,36 @@ mod tests {
         let mut g = sample();
         g.entries.remove(1);
         assert!(codes(&g).contains(&Code::BrokenChain));
+    }
+
+    #[test]
+    fn a_state_with_an_empty_name_is_reported_whatever_it_points_to() {
+        let mut h = sample();
+        let last = h.entries[2].hash.clone();
+        h.name_state("  ", &last);
+        assert_eq!(codes(&h), vec![Code::BadState]);
+        h.name_state("", "no-such-hash");
+        assert_eq!(
+            codes(&h),
+            vec![Code::BadState, Code::UnknownState, Code::BadState]
+        );
+        assert_eq!(Code::BadState.as_str(), "PHOENIX-DHIS-005");
+    }
+
+    #[test]
+    fn a_file_that_starts_with_the_byte_order_mark_is_read_like_one_that_does_not() {
+        let config = Config::default();
+        assert!(History::from_json("\u{feff}{}", &config).is_ok());
+        assert!(History::from_json("\u{feff}\n  {}", &config).is_ok());
+        // a mark in front of something that is not an object is still refused
+        assert!(matches!(
+            History::from_json("\u{feff}[]", &config),
+            Err(HistoryError::BadJson(_))
+        ));
+        assert!(matches!(
+            History::from_json("\u{feff}", &config),
+            Err(HistoryError::BadJson(_))
+        ));
     }
 
     #[test]

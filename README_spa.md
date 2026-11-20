@@ -46,7 +46,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Comprobaciones del repositorio | 🟡 | La comprobación del repositorio, la de las imágenes y las 3 pruebas de la base se ejecutan en el CI y pasan. |
-| Pruebas | 🟡 | Las 23 pruebas del código Rust y las 3 de la base pasan en un ordenador. Usan solo datos hechos por las propias pruebas. Incluyen una simulación con semilla fija de la herramienta de diseño que produce las operaciones, con fallos inyectados y recuperación. |
+| Pruebas | 🟡 | Las 28 pruebas del código Rust y las 3 de la base pasan en un ordenador. Usan solo datos hechos por las propias pruebas. Incluyen una simulación con semilla fija de la herramienta de diseño que produce las operaciones, con fallos inyectados y recuperación. |
 | Hardware real | 🟠 | No se ha ejecutado en ninguna máquina ni placa: nada de aquí se ha probado en hardware. |
 | Función planificada | 🟠 | Escrito: operaciones con la identidad del objeto, la cadena de hashes, los estados con nombre, el aviso de referencias a objetos borrados, la comparación de dos historiales, la búsqueda de la primera operación mala y una serialización que da los mismos bytes para el mismo contenido. Sin escribir: el productor de las operaciones y el enlace con la diferencia visual. |
 | Requisitos | 🟠 | Los 5 requisitos están en prototipo: hay código y pruebas, solo con datos hechos por las pruebas; ninguno está validado. |

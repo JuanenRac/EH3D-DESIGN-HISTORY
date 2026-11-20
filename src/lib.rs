@@ -29,6 +29,8 @@ pub enum Code {
     UnknownState,
     /// An operation refers to an object that an earlier operation deleted.
     DeletedReference,
+    /// A named state has an empty name.
+    BadState,
 }
 
 impl Code {
@@ -39,6 +41,7 @@ impl Code {
             Code::BadEntry => "PHOENIX-DHIS-002",
             Code::UnknownState => "PHOENIX-DHIS-003",
             Code::DeletedReference => "PHOENIX-DHIS-004",
+            Code::BadState => "PHOENIX-DHIS-005",
         }
     }
 }
