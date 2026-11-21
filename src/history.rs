@@ -515,4 +515,182 @@ mod tests {
             Err(HistoryError::TooLarge { .. })
         ));
     }
+
+    #[test]
+    fn the_same_operations_in_two_histories_give_the_same_hashes_and_the_stored_one_is_the_expected_one(
+    ) {
+        let (a, b) = (sample(), sample());
+        assert_eq!(a, b);
+        for e in &a.entries {
+            assert_eq!(e.hash, e.expected_hash());
+        }
+    }
+
+    #[test]
+    fn a_changed_summary_is_one_finding_and_names_the_place_of_the_operation() {
+        let mut h = sample();
+        h.entries[1].summary = "tampered".into();
+        let found = h.check(&Config::default());
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].code, Code::BrokenChain);
+        assert_eq!(found[0].index, Some(1));
+        assert_eq!(found[0].seq, 2);
+    }
+
+    #[test]
+    fn two_operations_that_swap_places_break_the_chain() {
+        let mut h = sample();
+        h.entries.swap(0, 1);
+        let found = codes(&h);
+        assert!(!found.is_empty());
+        assert!(found.iter().all(|c| *c == Code::BrokenChain));
+    }
+
+    #[test]
+    fn an_empty_history_is_clean_compares_equal_to_itself_and_has_no_bad_operation() {
+        let h = History::default();
+        assert!(codes(&h).is_empty());
+        let d = h.compare(&History::default());
+        assert_eq!(d.common, 0);
+        assert!(d.only_a.is_empty() && d.only_b.is_empty() && d.states_differ.is_empty());
+        assert!(h.first_bad(|_| true).is_none());
+    }
+
+    #[test]
+    fn a_history_compared_with_itself_shares_everything() {
+        let h = sample();
+        let d = h.compare(&h.clone());
+        assert_eq!(d.common, 3);
+        assert!(d.only_a.is_empty() && d.only_b.is_empty());
+    }
+
+    #[test]
+    fn the_comparison_read_from_the_other_side_swaps_what_only_each_one_did() {
+        let a = sample();
+        let mut b = sample();
+        b.append("net-modified", "n2", "joined n2", None, None)
+            .unwrap();
+        let (ab, ba) = (a.compare(&b), b.compare(&a));
+        assert_eq!(ab.common, ba.common);
+        assert_eq!(ab.only_a, ba.only_b);
+        assert_eq!(ab.only_b, ba.only_a);
+        assert_eq!(ab.only_b.len(), 1);
+    }
+
+    #[test]
+    fn the_halving_finds_the_operation_where_the_design_turns_bad_for_every_place() {
+        let mut h = History::default();
+        for n in 0..40 {
+            h.append("component-moved", &format!("c{n}"), "", None, None)
+                .unwrap();
+        }
+        for turn in 1..=40usize {
+            let found = h.first_bad(|prefix| prefix.len() >= turn).unwrap();
+            assert_eq!(found.seq, turn as u64, "{turn}");
+        }
+        assert!(h.first_bad(|_| false).is_none());
+    }
+
+    #[test]
+    fn a_long_history_is_chained_and_clean_without_a_panic() {
+        let mut h = History::default();
+        for n in 0..5000 {
+            h.append("component-moved", &format!("c{}", n % 50), "", None, None)
+                .unwrap();
+        }
+        assert_eq!(h.entries.len(), 5000);
+        assert!(codes(&h).is_empty());
+        assert_eq!(h.entries[4999].parent, h.entries[4998].hash);
+    }
+
+    #[test]
+    fn a_text_that_is_not_an_object_is_an_error_and_never_a_panic() {
+        let config = Config::default();
+        for text in [
+            "",
+            " ",
+            "null",
+            "[]",
+            "[1,2]",
+            "12",
+            "\"x\"",
+            "{",
+            "{\"entries\":3}",
+        ] {
+            assert!(
+                matches!(
+                    History::from_json(text, &config),
+                    Err(HistoryError::BadJson(_))
+                ),
+                "{text:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn an_object_with_nothing_in_it_is_an_empty_history() {
+        let h = History::from_json("{}", &Config::default()).unwrap();
+        assert_eq!(h, History::default());
+    }
+
+    #[test]
+    fn naming_a_state_again_replaces_it_and_a_state_on_a_real_operation_is_clean() {
+        let mut h = sample();
+        let first = h.entries[0].hash.clone();
+        let last = h.entries[2].hash.clone();
+        h.name_state("release", &first);
+        h.name_state("release", &last);
+        assert_eq!(h.states.len(), 1);
+        assert_eq!(h.states["release"], last);
+        assert!(codes(&h).is_empty());
+    }
+
+    #[test]
+    fn a_refused_operation_leaves_the_history_as_it_was() {
+        let mut h = sample();
+        let before = h.clone();
+        assert!(h.append("   ", "c1", "", None, None).is_err());
+        assert!(h.append("moved", "", "", None, None).is_err());
+        assert_eq!(h, before);
+    }
+
+    #[test]
+    fn text_in_any_script_is_written_and_read_back_with_the_same_hashes() {
+        let mut h = History::default();
+        h.append(
+            "object-created",
+            "c1",
+            "añadido \u{30b3}\u{30f3}\u{30c7}\u{30f3}\u{30b5} \u{7535}\u{5bb9}",
+            Some("0,0"),
+            None,
+        )
+        .unwrap();
+        let text = h.to_json().unwrap();
+        let again = History::from_json(&text, &Config::default()).unwrap();
+        assert_eq!(again, h);
+        assert!(codes(&again).is_empty());
+        assert_eq!(again.to_json().unwrap(), text);
+    }
+
+    #[test]
+    fn the_codes_are_written_in_order_and_none_repeats() {
+        let all = [
+            Code::BrokenChain,
+            Code::BadEntry,
+            Code::UnknownState,
+            Code::DeletedReference,
+            Code::BadState,
+        ];
+        let texts: Vec<&str> = all.iter().map(|c| c.as_str()).collect();
+        assert_eq!(
+            texts,
+            [
+                "PHOENIX-DHIS-001",
+                "PHOENIX-DHIS-002",
+                "PHOENIX-DHIS-003",
+                "PHOENIX-DHIS-004",
+                "PHOENIX-DHIS-005"
+            ]
+        );
+    }
 }
