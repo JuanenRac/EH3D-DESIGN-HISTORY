@@ -46,7 +46,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Repository-Prüfungen | 🟡 | Die Repository-Prüfung, die Prüfung der Bilder und die 3 Tests der Basis laufen in der CI und bestehen. |
-| Tests | 🟡 | Die 28 Tests des Rust-Codes und die 3 der Basis bestehen auf einem Rechner. Sie verwenden nur Daten, die die Tests selbst erzeugen. Dazu gehört eine Simulation mit festem Seed für das Entwurfswerkzeug, das die Operationen erzeugt, mit eingespeisten Fehlern und Wiederherstellung. |
+| Tests | 🟡 | Die 37 Tests des Rust-Codes und die 3 der Basis bestehen auf einem Rechner. Sie verwenden nur Daten, die die Tests selbst erzeugen. Dazu gehört eine Simulation mit festem Seed für das Entwurfswerkzeug, das die Operationen erzeugt, mit eingespeisten Fehlern und Wiederherstellung. |
 | Echte Hardware | 🟠 | Auf keiner Maschine und keiner Platine ausgeführt: nichts hier wurde auf Hardware ausprobiert. |
 | Geplante Funktion | 🟠 | Geschrieben: Operationen mit Objektidentität, die Hash-Kette, benannte Zustände, die Meldung von Verweisen auf gelöschte Objekte, der Vergleich zweier Historien, die Suche nach der ersten fehlerhaften Operation und eine Serialisierung, die für denselben Inhalt dieselben Bytes liefert. Nicht geschrieben: der Erzeuger der Operationen und die Verbindung zur visuellen Differenz. |
 | Anforderungen | 🟠 | Die 5 Anforderungen sind im Prototyp: Code und Tests existieren, nur mit von den Tests erzeugten Daten; keine ist validiert. |
@@ -99,13 +99,14 @@ Die Version steht in der Datei `VERSION` und in `eh3d.project.json`, und jede Ve
 EH3D-DESIGN-HISTORY/
 ├── docs/
 │   ├── architecture.json structure.json         die Daten der beiden Bilder
-│   ├── SCOPE.md REQUIREMENTS.md                 das Geplante und seine Anforderungen
+│   ├── SCOPE.md REQUIREMENTS.md                 der Umfang und das Anforderungsregister mit dem Test jeder Anforderung
 │   ├── DEPENDENCIES.md THREAT_MODEL.md          Beziehungen zu anderen Repositories und Bedrohungsmodell
 │   ├── DECISIONS.md STATUS.md                   hier geltende Entscheidungen und ehrlicher Status
 │   ├── NOT_YET.md RULES.md                      Ideen für später und Regeln zum Schreiben von Code
 │   └── adr/                                     die angenommenen Entscheidungsprotokolle
 ├── AGENTS.md                                    Regeln für alle, die das Repository ändern
 ├── src/                                         die Bibliothek und die Befehlszeile
+├── tests/                                       der Test, der das Anforderungsregister wahr hält
 ├── Cargo.toml Cargo.lock deny.toml              Rust-Paket und Richtlinie der Abhängigkeiten
 ├── rust-toolchain.toml                          die festgelegte Rust-Toolchain
 ├── tools/                                       die Repository-Prüfung, ihre Tests und die Bild-Werkzeuge
@@ -143,7 +144,11 @@ README und Texte gibt es auf Englisch, Spanisch, Französisch, Italienisch, Deut
 
 * [Die Konventionen der Suite](https://github.com/JuanenRac/EH3D-DOCS/blob/main/docs/CONVENTIONS.md)
 * [Änderungsprotokoll](CHANGELOG.md)
-* [Umfang, Anforderungen, Abhängigkeiten, Bedrohungsmodell und Entscheidungen](docs/SCOPE.md)
+* [Umfang](docs/SCOPE.md): wofür das Programm da ist, was es nicht tut und was es nie entscheidet.
+* [Anforderungen](docs/REQUIREMENTS.md): das Register der Fähigkeiten, der Stand jeder einzelnen und der Test, der sie zeigt.
+* [Stand](docs/STATUS.md): was es gibt, was fehlt und was noch offen ist.
+* [Noch nicht](docs/NOT_YET.md): gute Ideen, die in dieser Version fehlen.
+* [Regeln für Änderungen am Repository](AGENTS.md): die Regeln für alle, die das Repository ändern.
 
 ## 🤝 Mitwirken und Community
 

@@ -46,7 +46,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟡 | Les 28 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. Elles incluent une simulation à graine fixe de l'outil de conception qui produit les opérations, avec pannes injectées et reprise. |
+| Tests | 🟡 | Les 37 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. Elles incluent une simulation à graine fixe de l'outil de conception qui produit les opérations, avec pannes injectées et reprise. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
 | Fonction prévue | 🟠 | Écrit : opérations avec l'identité de l'objet, la chaîne de hashes, les états nommés, le signalement des références à des objets supprimés, la comparaison de deux historiques, la recherche de la première opération fautive et une sérialisation qui donne les mêmes octets pour le même contenu. Non écrit : le producteur des opérations et le lien avec la différence visuelle. |
 | Exigences | 🟠 | Les 5 exigences sont au stade de prototype : le code et les tests existent, seulement sur des données faites par les tests ; aucune n'est validée. |
@@ -99,13 +99,14 @@ La version se trouve dans le fichier `VERSION` et dans `eh3d.project.json`, et c
 EH3D-DESIGN-HISTORY/
 ├── docs/
 │   ├── architecture.json structure.json         les données des deux images
-│   ├── SCOPE.md REQUIREMENTS.md                 ce qui est prévu et ses exigences
+│   ├── SCOPE.md REQUIREMENTS.md                 le périmètre et le registre des exigences avec le test de chacune
 │   ├── DEPENDENCIES.md THREAT_MODEL.md          relations avec d'autres dépôts et modèle de menaces
 │   ├── DECISIONS.md STATUS.md                   décisions applicables ici et état honnête
 │   ├── NOT_YET.md RULES.md                      idées pour plus tard et règles d'écriture du code
 │   └── adr/                                     les décisions acceptées
 ├── AGENTS.md                                    règles pour quiconque modifie le dépôt
 ├── src/                                         la bibliothèque et la ligne de commande
+├── tests/                                       le test qui garde vrai le registre des exigences
 ├── Cargo.toml Cargo.lock deny.toml              paquet Rust et politique des dépendances
 ├── rust-toolchain.toml                          la toolchain Rust épinglée
 ├── tools/                                       le contrôle du dépôt, ses tests et les outils des images
@@ -143,7 +144,11 @@ Le README et les textes existent en anglais, espagnol, français, italien, allem
 
 * [Les conventions de la suite](https://github.com/JuanenRac/EH3D-DOCS/blob/main/docs/CONVENTIONS.md)
 * [Journal des modifications](CHANGELOG.md)
-* [Périmètre, exigences, dépendances, modèle de menaces et décisions](docs/SCOPE.md)
+* [Périmètre](docs/SCOPE.md): à quoi sert le programme, ce qu'il ne fera pas et ce qu'il ne décide jamais.
+* [Exigences](docs/REQUIREMENTS.md): le registre des capacités, l'état de chacune et le test qui la montre.
+* [État](docs/STATUS.md): ce qui existe, ce qui manque et ce qui reste ouvert.
+* [Pas encore](docs/NOT_YET.md): de bonnes idées laissées de côté dans cette version.
+* [Règles pour modifier le dépôt](AGENTS.md): les règles pour qui modifie le dépôt.
 
 ## 🤝 Contribuer et communauté
 
