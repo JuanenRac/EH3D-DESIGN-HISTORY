@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-Markdown%20%2B%20Python-blue.svg" alt="Markdown and Python">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-3-2EA043.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-68-2EA043.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.0.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-scaffolding-FFB020.svg" alt="Maturity">
 </p>
@@ -31,7 +31,7 @@
 |---|---|
 | バージョン | `0.0.4` |
 | 成熟度 | 足場 |
-| テスト | 3 |
+| テスト | 68 |
 | 技術スタック | Markdown, Python 3.10+ |
 | 実機での動作 | まだハードウェアでは実行していません |
 
@@ -45,8 +45,8 @@
 
 | 領域 | 状態 | ここでの意味 |
 |---|---|---|
-| リポジトリ チェック | 🟡 | リポジトリ チェック、画像のチェック、基盤の 3 件のテストは CI で実行され、通っています。 |
-| テスト | 🟡 | Rust コードの 37 件と基盤の 3 件のテストがコンピューター上で成功します。使うのはテスト自身が作ったデータだけです。固定シードによる操作を生成する設計ツールのシミュレーション（障害の注入と復旧を含む）も含まれます。 |
+| リポジトリ チェック | 🟡 | リポジトリ チェック、画像のチェック、基盤の 68 件のテストは CI で実行され、通っています。 |
+| テスト | 🟡 | Rust コードの 51 件と基盤の 68 件のテストがコンピューター上で成功します。使うのはテスト自身が作ったデータだけです。固定シードによる操作を生成する設計ツールのシミュレーション（障害の注入と復旧を含む）も含まれます。 |
 | 実機 | 🟠 | どの機械やボードでも実行していません。ここにあるものは、ハードウェア上で試していません。 |
 | 計画中の機能 | 🟠 | 作成済み：対象の識別情報を持つ操作、ハッシュの連鎖、名前付きの状態、削除済みの対象への参照の報告、2 つの履歴の比較、最初の不良操作の探索、同じ内容なら同じバイト列になる直列化。未作成：操作の生成元と視覚的な差分との連携。 |
 | 要件 | 🟠 | 5 件の要件はプロトタイプです。コードとテストはありますが、テストが作ったデータだけで、検証済みのものはありません。 |
@@ -80,7 +80,7 @@ python -I -m unittest discover -s tools -p "test_*.py"
 
 ## 🧪 テスト
 
-基盤には 3 件のテストがあり（`python -I -m unittest discover -s tools -p "test_*.py"`）、通っています。CI はリポジトリ チェック、画像のチェック、これらのテストを実行します。
+基盤には 68 件のテストがあり（`python -I -m unittest discover -s tools -p "test_*.py"`）、通っています。CI はリポジトリ チェック、画像のチェック、これらのテストを実行します。
 
 ## 🏗️ ビルドとリリース
 

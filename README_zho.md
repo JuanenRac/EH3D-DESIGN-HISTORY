@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-Markdown%20%2B%20Python-blue.svg" alt="Markdown and Python">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-3-2EA043.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-68-2EA043.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.0.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-scaffolding-FFB020.svg" alt="Maturity">
 </p>
@@ -31,7 +31,7 @@
 |---|---|
 | 版本 | `0.0.4` |
 | 成熟度 | 脚手架 |
-| 测试 | 3 |
+| 测试 | 68 |
 | 技术栈 | Markdown, Python 3.10+ |
 | 真实硬件 | 尚未在硬件上运行 |
 
@@ -45,8 +45,8 @@
 
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
-| 仓库检查 | 🟡 | 仓库检查、图片检查以及基础部分的 3 个测试都在 CI 中运行并通过。 |
-| 测试 | 🟡 | Rust 代码的 37 个测试和基础部分的 3 个测试在计算机上通过。它们只使用测试自己生成的数据。其中包括对产生操作的设计工具的固定种子模拟，含注入故障与恢复。 |
+| 仓库检查 | 🟡 | 仓库检查、图片检查以及基础部分的 68 个测试都在 CI 中运行并通过。 |
+| 测试 | 🟡 | Rust 代码的 51 个测试和基础部分的 68 个测试在计算机上通过。它们只使用测试自己生成的数据。其中包括对产生操作的设计工具的固定种子模拟，含注入故障与恢复。 |
 | 真实硬件 | 🟠 | 没有在任何机床或电路板上运行过：这里没有任何内容在硬件上试过。 |
 | 计划的功能 | 🟠 | 已编写：带对象身份的操作、哈希链、命名状态、对已删除对象引用的报告、两份历史的比较、查找第一个出错的操作，以及相同内容得到相同字节的序列化。未编写：操作的生成方和与可视化差异的连接。 |
 | 需求 | 🟠 | 5 项需求处于原型阶段：有代码和测试，但只用测试生成的数据；没有一项已验证。 |
@@ -80,7 +80,7 @@ python -I -m unittest discover -s tools -p "test_*.py"
 
 ## 🧪 测试
 
-基础部分有 3 个测试（`python -I -m unittest discover -s tools -p "test_*.py"`），并且都通过。CI 运行仓库检查、图片检查和这些测试。
+基础部分有 68 个测试（`python -I -m unittest discover -s tools -p "test_*.py"`），并且都通过。CI 运行仓库检查、图片检查和这些测试。
 
 ## 🏗️ 构建与发布
 
