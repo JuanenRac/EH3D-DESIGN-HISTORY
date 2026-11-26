@@ -7,7 +7,6 @@
 
 use crate::config::Config;
 use crate::history::{Entry, History};
-use crate::Code;
 
 /// A small deterministic generator (SplitMix64): the same seed always gives the same numbers.
 #[derive(Debug, Clone)]
@@ -176,16 +175,15 @@ pub fn inject(history: &mut History, fault: Fault, config: &Config) -> bool {
 /// The recovery: keep the longest prefix of operations that the checks accept, drop the states that point outside it and say how many operations were lost.
 pub fn recover(history: &History, config: &Config) -> (History, usize) {
     let mut keep = history.entries.len();
+    // the place in the list, not the number the operation carries: a damaged operation may carry 0 or the number of another one
     for finding in history.check(config) {
-        if finding.code != Code::UnknownState && finding.seq > 0 {
-            if let Some(index) = history.entries.iter().position(|e| e.seq == finding.seq) {
-                keep = keep.min(index);
-            }
+        if let Some(index) = finding.index {
+            keep = keep.min(index);
         }
     }
     let entries: Vec<Entry> = history.entries[..keep].to_vec();
     let mut states = history.states.clone();
-    states.retain(|_, hash| entries.iter().any(|e| &e.hash == hash));
+    states.retain(|name, hash| !name.trim().is_empty() && entries.iter().any(|e| &e.hash == hash));
     let lost = history.entries.len() - entries.len();
     (History { entries, states }, lost)
 }
@@ -193,6 +191,7 @@ pub fn recover(history: &History, config: &Config) -> (History, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Code;
 
     fn twin(seed: u64) -> DesignerTwin {
         DesignerTwin::new(seed, Config::default())
@@ -318,5 +317,66 @@ mod tests {
         assert!(d.common >= 20);
         assert_eq!(d.common + d.only_a.len(), 26);
         assert_eq!(d.common + d.only_b.len(), 29);
+    }
+
+    #[test]
+    fn recovery_cuts_at_the_place_of_a_damaged_operation_that_carries_the_number_zero() {
+        let config = Config::default();
+        let mut h = twin(13).history(20);
+        h.entries[12].seq = 0;
+        let (repaired, lost) = recover(&h, &config);
+        assert_eq!((repaired.entries.len(), lost), (12, 8));
+        assert!(codes(&repaired).is_empty(), "{:?}", codes(&repaired));
+    }
+
+    #[test]
+    fn recovery_does_not_lose_the_good_operation_whose_number_a_damaged_one_copied() {
+        let config = Config::default();
+        let mut h = twin(13).history(20);
+        h.entries[12].seq = 2;
+        let (repaired, lost) = recover(&h, &config);
+        assert_eq!((repaired.entries.len(), lost), (12, 8));
+        assert!(codes(&repaired).is_empty());
+    }
+
+    #[test]
+    fn recovery_drops_a_state_with_an_empty_name() {
+        let mut h = twin(1).history(10);
+        let hash = h.entries[3].hash.clone();
+        h.name_state(" ", &hash);
+        h.name_state("kept", &hash);
+        let (repaired, lost) = recover(&h, &Config::default());
+        assert_eq!(lost, 0);
+        assert!(codes(&repaired).is_empty(), "{:?}", codes(&repaired));
+        assert!(repaired.states.contains_key("kept") && repaired.states.contains_key("latest"));
+        assert_eq!(repaired.states.len(), 2);
+    }
+
+    #[test]
+    fn a_seeded_campaign_of_damage_always_recovers_to_a_clean_start_of_the_original() {
+        let config = Config::default();
+        let original = twin(31).history(60);
+        let mut rng = SimRng::new(77);
+        for round in 0..200 {
+            let mut broken = original.clone();
+            for _ in 0..1 + rng.below(3) {
+                let at = rng.below(broken.entries.len() as u64) as usize;
+                match rng.below(5) {
+                    0 => broken.entries[at].seq = rng.below(70),
+                    1 => broken.entries[at].parent.clear(),
+                    2 => broken.entries[at].hash = "f".repeat(64),
+                    3 => broken.entries[at].object.clear(),
+                    _ => broken.entries[at].summary.push('!'),
+                }
+            }
+            let (repaired, lost) = recover(&broken, &config);
+            assert!(codes(&repaired).is_empty(), "round {round}");
+            assert_eq!(repaired.entries.len() + lost, 60, "round {round}");
+            assert_eq!(
+                repaired.entries,
+                original.entries[..repaired.entries.len()],
+                "round {round}"
+            );
+        }
     }
 }

@@ -31,6 +31,13 @@ fn read_text(path: &Path, limit: u64) -> Result<String, HistoryError> {
     fs::read_to_string(path).map_err(io)
 }
 
+/// A text of the file printed on one line: a control character (a line feed above all) becomes a space, so that a file cannot write lines of its own into the output.
+fn one_line(text: &str) -> String {
+    text.chars()
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .collect()
+}
+
 /// Run the command line with the given arguments (without the program name). Returns the exit code.
 pub fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
     match dispatch(args, out) {
@@ -77,7 +84,7 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<HistoryE
                     f.code.as_str(),
                     f.seq,
                     place,
-                    f.message
+                    one_line(&f.message)
                 );
             }
             let _ = writeln!(
@@ -91,7 +98,8 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<HistoryE
         ["log", _] => {
             let history = load(&args[1])?;
             for e in &history.entries {
-                let _ = writeln!(out, "{} {} {} {}", e.seq, e.kind, e.object, e.summary);
+                let line = format!("{} {} {} {}", e.seq, e.kind, e.object, e.summary);
+                let _ = writeln!(out, "{}", one_line(&line));
             }
             Ok(0)
         }
@@ -100,13 +108,15 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<HistoryE
             let d = a.compare(&b);
             let _ = writeln!(out, "common {}", d.common);
             for e in &d.only_a {
-                let _ = writeln!(out, "only first: {} {} {}", e.seq, e.kind, e.object);
+                let line = format!("only first: {} {} {}", e.seq, e.kind, e.object);
+                let _ = writeln!(out, "{}", one_line(&line));
             }
             for e in &d.only_b {
-                let _ = writeln!(out, "only second: {} {} {}", e.seq, e.kind, e.object);
+                let line = format!("only second: {} {} {}", e.seq, e.kind, e.object);
+                let _ = writeln!(out, "{}", one_line(&line));
             }
             for name in &d.states_differ {
-                let _ = writeln!(out, "state differs: {name}");
+                let _ = writeln!(out, "state differs: {}", one_line(name));
             }
             Ok(
                 if d.only_a.is_empty() && d.only_b.is_empty() && d.states_differ.is_empty() {
@@ -241,5 +251,37 @@ mod tests {
         ]);
         assert_eq!(code, 1);
         assert!(text.contains("PHOENIX-DHIS-004"), "{text}");
+    }
+
+    #[test]
+    fn a_line_feed_in_the_file_cannot_write_a_line_of_its_own() {
+        let work = tempfile::tempdir().unwrap();
+        let path = work.path().join("h.json");
+        let mut h = History::default();
+        h.append(
+            "component-moved",
+            "c1",
+            "moved\n2 object-deleted c1 forged",
+            None,
+            None,
+        )
+        .unwrap();
+        let hash = h.entries[0].hash.clone();
+        let mut named = h.clone();
+        named.name_state("a\nonly second: 9 forged x", &hash);
+        fs::write(&path, h.to_json().unwrap()).unwrap();
+        let other = work.path().join("n.json");
+        fs::write(&other, named.to_json().unwrap()).unwrap();
+        let (path, other) = (path.to_str().unwrap(), other.to_str().unwrap());
+        let (code, text, _) = call(&["log", path]);
+        assert_eq!(code, 0);
+        assert_eq!(text.lines().count(), 1, "{text}");
+        let (code, text, _) = call(&["compare", path, other]);
+        assert_eq!(code, 1);
+        assert_eq!(text.lines().count(), 2, "{text}");
+        assert!(
+            !text.lines().any(|l| l.starts_with("only second:")),
+            "{text}"
+        );
     }
 }
