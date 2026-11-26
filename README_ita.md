@@ -46,7 +46,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Controlli del repository | 🟡 | Il controllo del repository, quello delle immagini e i 68 test della base girano nella CI e passano. |
-| Test | 🟡 | I 51 test del codice Rust e i 68 della base passano su un computer. Usano solo dati prodotti dai test stessi. Includono una simulazione a seme fisso di lo strumento di progetto che produce le operazioni, con guasti iniettati e ripristino. |
+| Test | 🟡 | I 61 test del codice Rust e i 68 della base passano su un computer. Usano solo dati prodotti dai test stessi. Includono una simulazione a seme fisso di lo strumento di progetto che produce le operazioni, con guasti iniettati e ripristino. |
 | Hardware reale | 🟠 | Non eseguito su nessuna macchina né scheda: nulla qui è stato provato su hardware. |
 | Funzione pianificata | 🟠 | Scritto: operazioni con l'identità dell'oggetto, la catena di hash, gli stati con nome, la segnalazione dei riferimenti a oggetti cancellati, il confronto di due cronologie, la ricerca della prima operazione difettosa e una serializzazione che dà gli stessi byte per lo stesso contenuto. Non scritto: il produttore delle operazioni e il collegamento con la differenza visiva. |
 | Requisiti | 🟠 | I 5 requisiti sono a livello di prototipo: codice e test esistono, solo su dati prodotti dai test; nessuno è validato. |

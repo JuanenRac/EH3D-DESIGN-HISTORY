@@ -99,8 +99,41 @@ pub struct History {
     #[serde(default)]
     pub entries: Vec<Entry>,
     /// Named states: the name, and the hash of the operation the design was at.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "unique_map")]
     pub states: BTreeMap<String, String>,
+}
+
+/// A JSON object read as a map that refuses a key written twice: without this the last one would silently take the place of the others.
+fn unique_map<'de, D, V>(deserializer: D) -> Result<BTreeMap<String, V>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    V: Deserialize<'de>,
+{
+    struct Unique<V>(std::marker::PhantomData<V>);
+    impl<'de, V: Deserialize<'de>> serde::de::Visitor<'de> for Unique<V> {
+        type Value = BTreeMap<String, V>;
+
+        fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("an object")
+        }
+
+        fn visit_map<A: serde::de::MapAccess<'de>>(
+            self,
+            mut map: A,
+        ) -> Result<Self::Value, A::Error> {
+            let mut out = BTreeMap::new();
+            while let Some((key, value)) = map.next_entry::<String, V>()? {
+                if out.contains_key(&key) {
+                    return Err(serde::de::Error::custom(format!(
+                        "the key `{key}` is written twice"
+                    )));
+                }
+                out.insert(key, value);
+            }
+            Ok(out)
+        }
+    }
+    deserializer.deserialize_map(Unique(std::marker::PhantomData))
 }
 
 impl History {
@@ -692,5 +725,80 @@ mod tests {
                 "PHOENIX-DHIS-005"
             ]
         );
+    }
+
+    #[test]
+    fn a_state_written_twice_is_refused_and_not_replaced_in_silence() {
+        let text = r#"{"states":{"release":"a","release":"b"}}"#;
+        match History::from_json(text, &Config::default()) {
+            Err(HistoryError::BadJson(message)) => {
+                assert!(message.contains("release"), "{message}")
+            }
+            other => panic!("{other:?}"),
+        }
+        assert!(History::from_json(r#"{"states":{"a":"1","b":"1"}}"#, &Config::default()).is_ok());
+    }
+
+    #[test]
+    fn a_history_cut_at_any_place_is_an_error_and_never_a_panic() {
+        let mut h = sample();
+        let last = h.entries[2].hash.clone();
+        h.name_state("release \u{7248}", &last);
+        let text = h.to_json().unwrap();
+        for end in (0..text.len()).filter(|i| text.is_char_boundary(*i)) {
+            assert!(
+                matches!(
+                    History::from_json(&text[..end], &Config::default()),
+                    Err(HistoryError::BadJson(_))
+                ),
+                "cut at {end}"
+            );
+        }
+    }
+
+    #[test]
+    fn every_field_of_an_operation_is_covered_by_its_hash() {
+        for field in 0..7 {
+            let mut h = sample();
+            let e = &mut h.entries[2];
+            match field {
+                0 => e.seq = 9,
+                1 => e.parent.push('0'),
+                2 => e.kind.push('x'),
+                3 => e.object.push('x'),
+                4 => e.summary.push('x'),
+                5 => e.before = Some(String::new()),
+                _ => e.after = Some(String::new()),
+            }
+            assert_ne!(e.hash, e.expected_hash(), "field {field}");
+            assert!(codes(&h).contains(&Code::BrokenChain), "field {field}");
+        }
+    }
+
+    #[test]
+    fn a_text_that_moves_from_one_field_to_the_next_gives_another_hash() {
+        let mut a = History::default();
+        a.append("moved", "c1", "ab", None, Some("c")).unwrap();
+        let mut b = History::default();
+        b.append("moved", "c1", "a", Some("b"), Some("c")).unwrap();
+        let mut c = History::default();
+        c.append("moved", "c1", "ab", Some(""), Some("c")).unwrap();
+        assert_ne!(a.entries[0].hash, b.entries[0].hash);
+        assert_ne!(a.entries[0].hash, c.entries[0].hash);
+    }
+
+    #[test]
+    fn the_halving_asks_only_a_few_times_even_in_a_long_history() {
+        let mut h = History::default();
+        for _ in 0..1024 {
+            h.append("component-moved", "c1", "", None, None).unwrap();
+        }
+        let asked = std::cell::Cell::new(0u32);
+        let found = h.first_bad(|prefix| {
+            asked.set(asked.get() + 1);
+            prefix.len() >= 700
+        });
+        assert_eq!(found.map(|e| e.seq), Some(700));
+        assert!(asked.get() <= 12, "{}", asked.get());
     }
 }
