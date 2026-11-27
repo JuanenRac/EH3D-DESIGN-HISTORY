@@ -46,7 +46,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Repository checks | 🟡 | The repository check, the check of the pictures and the 68 tests of the base run in CI and pass. |
-| Tests | 🟡 | 61 tests of the Rust code and the 68 of the base pass on a computer. They use only data made by the tests themselves. They include a seeded simulation of the design tool that produces the operations with injected faults and recovery. |
+| Tests | 🟡 | 62 tests of the Rust code and the 68 of the base pass on a computer. They use only data made by the tests themselves. They include a seeded simulation of the design tool that produces the operations with injected faults and recovery. |
 | Real hardware | 🟠 | Not run on any machine or board: nothing here has been tried on hardware. |
 | Planned function | 🟠 | Written: operations keyed by object identity, the hash chain, named states, the report of references to deleted objects, the comparison of two histories, the search of the first bad operation and a serialisation that gives the same bytes for the same content. Not written: the producer of the operations and the link with the visual difference. |
 | Requirements | 🟠 | The 5 requirements are at prototype: code and tests exist, only on data made by the tests; none is validated. |
