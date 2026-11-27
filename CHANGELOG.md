@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A name read from a file can no longer forge a line of the output:** line breaks and control characters in the error messages (and Unicode line separators anywhere in the output) are printed as spaces. What is compared, hashed and the exit codes do not change.
+- **1 more test** of the Rust code, for the above.
+
 ## [0.0.5] - Correct recovery of damaged histories, and many more tests
 
 - **The recovery of a damaged history cuts at the right place:** it looked for the number the faulty operation carried, so an operation numbered 0 stayed in the result and one that copied the number of an earlier one cut away good operations. It now uses the place in the list, and drops a state with an empty name.
